@@ -43,3 +43,33 @@ Should you want to clean up all resources created in this project, run the follo
    ```shell
    terraform apply tfplan.out
    ```
+<!-- BEGINNING OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
+## Requirements
+
+| Name | Version |
+|------|---------|
+| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | = 1.1.0 |
+| <a name="requirement_aws"></a> [aws](#requirement\_aws) | 3.72.0 |
+
+## Providers
+
+No providers.
+
+## Modules
+
+| Name | Source | Version |
+|------|--------|---------|
+| <a name="module_s3_backend"></a> [s3\_backend](#module\_s3\_backend) | ../.. | n/a |
+
+## Resources
+
+No resources.
+
+## Inputs
+
+No inputs.
+
+## Outputs
+
+No outputs.
+<!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->

@@ -7,6 +7,7 @@ locals {
   }
 }
 
+# tfsec:ignore:aws-s3-enable-bucket-logging
 resource "aws_s3_bucket" "this" {
   bucket = local.bucket_name
   policy = data.aws_iam_policy_document.deny_unencrypted.json
@@ -128,5 +129,26 @@ resource "aws_dynamodb_table" "this" {
     type = "S"
   }
 
+  point_in_time_recovery {
+    enabled = true
+  }
+
+  server_side_encryption {
+    enabled = true
+  }
+
   tags = merge(local.default_tags, var.tags)
+}
+
+resource "aws_kms_key" "this" {
+  description             = "Terraform S3 backend main key"
+  deletion_window_in_days = 10
+  enable_key_rotation     = true
+
+  tags = merge(local.default_tags, var.tags)
+}
+
+resource "aws_kms_alias" "this" {
+  name          = "alias/${var.key_alias}"
+  target_key_id = aws_kms_key.this.id
 }
