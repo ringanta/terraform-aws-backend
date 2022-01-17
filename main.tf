@@ -1,6 +1,7 @@
 locals {
-  bucket_name = var.name
-  table_name  = "${local.bucket_name}-lock"
+  bucket_name            = var.name
+  table_name             = "${local.bucket_name}-lock"
+  module_registry_bucket = var.module_registry_bucket == null ? "${var.name}-registry" : var.module_registry_bucket
 
   default_tags = {
     ManagedBy = "terraform"
@@ -175,10 +176,13 @@ data "aws_iam_policy_document" "this" {
       "s3:GetObject",
       "s3:PutObject",
       "s3:DeleteObject",
+      "s3:GetObjectTagging",
+      "s3:PutObjectTagging",
+      "s3:DeleteObjectTagging",
     ]
 
     resources = [
-      "${aws_s3_bucket.this.arn}/*"
+      "${aws_s3_bucket.this.arn}/*",
     ]
   }
 
@@ -212,9 +216,110 @@ data "aws_iam_policy_document" "this" {
   }
 }
 
+resource "aws_s3_bucket" "module_registry" {
+  count = var.create_module_registry_bucket ? 1 : 0
+
+  bucket = local.module_registry_bucket
+  policy = data.aws_iam_policy_document.deny_unencrypted_request[0].json
+
+  versioning {
+    enabled = true
+  }
+
+  server_side_encryption_configuration {
+    rule {
+      apply_server_side_encryption_by_default {
+        sse_algorithm = "AES256"
+      }
+    }
+  }
+
+  tags = merge(local.default_tags, var.tags)
+}
+
+resource "aws_s3_bucket_public_access_block" "module_registry" {
+  count = var.create_module_registry_bucket ? 1 : 0
+
+  bucket                  = aws_s3_bucket.module_registry[0].id
+  block_public_acls       = true
+  block_public_policy     = true
+  ignore_public_acls      = true
+  restrict_public_buckets = true
+}
+
+data "aws_iam_policy_document" "deny_unencrypted_request" {
+  count = var.create_module_registry_bucket ? 1 : 0
+
+  statement {
+    sid = "EnforceTlsRequestsOnly"
+
+    effect = "Deny"
+
+    principals {
+      type        = "AWS"
+      identifiers = ["*"]
+    }
+
+    actions = ["s3:*"]
+
+    resources = [
+      "arn:aws:s3:::${local.module_registry_bucket}",
+      "arn:aws:s3:::${local.module_registry_bucket}/*",
+    ]
+
+    condition {
+      test     = "Bool"
+      variable = "aws:SecureTransport"
+      values   = ["false"]
+    }
+  }
+}
+
+data "aws_iam_policy_document" "module_registry" {
+  count = var.create_module_registry_bucket ? 1 : 0
+
+  statement {
+    sid = "AllowListBucketModuleRegistry"
+
+    actions = [
+      "s3:ListBucket",
+    ]
+
+    resources = [
+      "arn:aws:s3:::${local.module_registry_bucket}",
+    ]
+  }
+
+  statement {
+    sid = "AllowRWBucketObjectModuleRegistry"
+
+    actions = [
+      "s3:GetObject",
+      "s3:PutObject",
+      "s3:DeleteObject",
+      "s3:GetObjectTagging",
+      "s3:PutObjectTagging",
+      "s3:DeleteObjectTagging",
+    ]
+
+    resources = [
+      "arn:aws:s3:::${local.module_registry_bucket}/*",
+    ]
+  }
+}
+
+data "aws_iam_policy_document" "combined" {
+  count = var.create_module_registry_bucket ? 1 : 0
+
+  source_policy_documents = [
+    data.aws_iam_policy_document.this.json,
+    data.aws_iam_policy_document.module_registry[0].json,
+  ]
+}
+
 resource "aws_iam_policy" "this" {
   count = var.create_iam_policy ? 1 : 0
 
   name   = var.iam_policy_name
-  policy = data.aws_iam_policy_document.this.json
+  policy = var.create_module_registry_bucket ? data.aws_iam_policy_document.combined[0].json : data.aws_iam_policy_document.this.json
 }

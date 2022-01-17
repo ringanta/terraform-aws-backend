@@ -3,6 +3,11 @@ output "bucket_name" {
   value       = aws_s3_bucket.this.id
 }
 
+output "bucket_arn" {
+  description = "ARN of the S3 bucket for the Terraform backend"
+  value       = aws_s3_bucket.this.arn
+}
+
 output "table_name" {
   description = "DynamoDB table name for the Terraform backend lock"
   value       = aws_dynamodb_table.this.name
@@ -36,4 +41,14 @@ output "s3_backend_sample_config" {
     dynamodb_table = aws_dynamodb_table.this.name
     kms_key_alias  = aws_kms_alias.this.arn
   })
+}
+
+output "module_registry_bucket" {
+  description = "S3 Bucket name for the private module registry"
+  value       = join("", aws_s3_bucket.module_registry.*.id)
+}
+
+output "module_registry_arn" {
+  description = "S3 Bucket ARN for the private module registry"
+  value       = join("", aws_s3_bucket.module_registry.*.arn)
 }

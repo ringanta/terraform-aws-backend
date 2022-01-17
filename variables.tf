@@ -3,8 +3,8 @@ variable "name" {
   type        = string
 
   validation {
-    condition     = length(var.name) >= 3 && length(var.name) <= 58
-    error_message = "Bucket name must be between 3 and 58 characters long."
+    condition     = length(var.name) >= 3 && length(var.name) <= 54
+    error_message = "Bucket name for S3 backend must be between 3 and 54 characters long."
   }
 }
 
@@ -30,4 +30,16 @@ variable "iam_policy_name" {
   description = "Name of IAM Policy that has full access to all resources"
   type        = string
   default     = "TerraformS3BackendFullAccess"
+}
+
+variable "create_module_registry_bucket" {
+  description = "Flag to decide whether to create S3 bucket for Terraform module private registry"
+  type        = bool
+  default     = false
+}
+
+variable "module_registry_bucket" {
+  description = "Name of S3 bucket that will be created for the Terraform module private registry"
+  type        = string
+  default     = null
 }

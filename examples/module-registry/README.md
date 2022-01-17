@@ -1,6 +1,6 @@
-# Basic Usage S3 Backend
+# Module Registry S3 Backend
 
-Demonstrate basic usage of the s3-backend Terraform module.
+Demonstrating the s3-backend Terraform module with module registry capability.
 
 ## Prerequisites
 
