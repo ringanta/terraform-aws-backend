@@ -1,0 +1,10 @@
+terraform {
+  backend "s3" {
+    bucket         = "${bucket_name}"
+    key            = "path/to/key.tfstate"
+    region         = "${region}"
+    encrypt        = true
+    dynamodb_table = "${dynamodb_table}"
+    kms_key_id     = "${kms_key_alias}"
+  }
+}

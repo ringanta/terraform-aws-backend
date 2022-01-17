@@ -19,3 +19,15 @@ variable "tags" {
   type        = map(any)
   default     = {}
 }
+
+variable "create_iam_policy" {
+  description = "Flag to decided whether to create IAM Policy that have full access to Terraform S3 backend resources"
+  type        = bool
+  default     = true
+}
+
+variable "iam_policy_name" {
+  description = "Name of IAM Policy that has full access to all resources"
+  type        = string
+  default     = "TerraformS3BackendFullAccess"
+}

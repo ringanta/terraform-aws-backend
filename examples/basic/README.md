@@ -71,5 +71,13 @@ No inputs.
 
 ## Outputs
 
-No outputs.
+| Name | Description |
+|------|-------------|
+| <a name="output_bucket_name"></a> [bucket\_name](#output\_bucket\_name) | Name of the S3 bucket for the Terraform backend |
+| <a name="output_iam_policy_arn"></a> [iam\_policy\_arn](#output\_iam\_policy\_arn) | ARN of IAM Policy that have full access to use the Terraform S3 backend |
+| <a name="output_iam_policy_json"></a> [iam\_policy\_json](#output\_iam\_policy\_json) | Content (in JSON format) of IAM Policy that have full access to the Terraform S3 backend |
+| <a name="output_key_alias_arn"></a> [key\_alias\_arn](#output\_key\_alias\_arn) | ARN of the alias for the KMS main key |
+| <a name="output_key_arn"></a> [key\_arn](#output\_key\_arn) | ARN of the KMS main key |
+| <a name="output_s3_backend_sample_config"></a> [s3\_backend\_sample\_config](#output\_s3\_backend\_sample\_config) | Example configuration to use this S3 backend |
+| <a name="output_table_name"></a> [table\_name](#output\_table\_name) | DynamoDB table name for the Terraform backend lock |
 <!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->

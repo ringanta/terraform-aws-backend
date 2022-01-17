@@ -7,6 +7,8 @@ locals {
   }
 }
 
+data "aws_region" "this" {}
+
 # tfsec:ignore:aws-s3-enable-bucket-logging
 resource "aws_s3_bucket" "this" {
   bucket = local.bucket_name
@@ -72,7 +74,7 @@ data "aws_iam_policy_document" "deny_unencrypted" {
     ]
 
     resources = [
-      "aws:arn:s3:::${local.bucket_name}/*",
+      "arn:aws:s3:::${local.bucket_name}/*",
     ]
 
     condition {
@@ -151,4 +153,68 @@ resource "aws_kms_key" "this" {
 resource "aws_kms_alias" "this" {
   name          = "alias/${var.key_alias}"
   target_key_id = aws_kms_key.this.id
+}
+
+data "aws_iam_policy_document" "this" {
+  statement {
+    sid = "AllowListBucket"
+
+    actions = [
+      "s3:ListBucket",
+    ]
+
+    resources = [
+      aws_s3_bucket.this.arn,
+    ]
+  }
+
+  statement {
+    sid = "AllowRWBucketObject"
+
+    actions = [
+      "s3:GetObject",
+      "s3:PutObject",
+      "s3:DeleteObject",
+    ]
+
+    resources = [
+      "${aws_s3_bucket.this.arn}/*"
+    ]
+  }
+
+  statement {
+    sid = "AllowRWDynamoDBTable"
+
+    actions = [
+      "dynamodb:GetItem",
+      "dynamodb:PutItem",
+      "dynamodb:DeleteItem",
+    ]
+
+    resources = [
+      aws_dynamodb_table.this.arn,
+    ]
+  }
+
+  statement {
+    sid = "AllowEncryptDecryptKMS"
+
+    actions = [
+      "kms:Encrypt",
+      "kms:Decrypt",
+      "kms:GenerateDataKey",
+    ]
+
+    resources = [
+      aws_kms_key.this.arn,
+      aws_kms_alias.this.arn,
+    ]
+  }
+}
+
+resource "aws_iam_policy" "this" {
+  count = var.create_iam_policy ? 1 : 0
+
+  name   = var.iam_policy_name
+  policy = data.aws_iam_policy_document.this.json
 }
