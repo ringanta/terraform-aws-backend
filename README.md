@@ -66,3 +66,11 @@ No modules.
 | <a name="output_s3_backend_sample_config"></a> [s3\_backend\_sample\_config](#output\_s3\_backend\_sample\_config) | Example configuration to use this S3 backend |
 | <a name="output_table_name"></a> [table\_name](#output\_table\_name) | DynamoDB table name for the Terraform backend lock |
 <!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
+
+## Authors
+
+This module is managed by [Roy Ginting](https://github.com/ringanta)
+
+## License
+
+This module is licensed under Apache 2 license. See [LICENSE](https://github.com/ringanta/terraform-aws-backend/tree/master/LICENSE) file for full details.
